@@ -23,13 +23,13 @@
 """
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
-from qgis.PyQt.QtWidgets import QAction
+from qgis.PyQt.QtWidgets import QAction, QFileDialog
 
 # Initialize Qt resources from file resources.py
 from .resources import *
 # Import the code for the dialog
 from .odm_image_extents_dialog import OdmImageExtentsDialog
-import os.path
+import os.path, json
 
 
 class OdmImageExtents:
@@ -53,6 +53,8 @@ class OdmImageExtents:
             self.plugin_dir,
             'i18n',
             'OdmImageExtents_{}.qm'.format(locale))
+
+        self.dict_data = None
 
         if os.path.exists(locale_path):
             self.translator = QTranslator()
@@ -189,12 +191,55 @@ class OdmImageExtents:
             self.first_start = False
             self.dlg = OdmImageExtentsDialog()
 
-        # show the dialog
+        # Show the dialog
         self.dlg.show()
+        
+        # Button pressed
+        self.dlg.butImageFile.clicked.connect(self.select_image_json_file)
+        self.dlg.butReadJson.clicked.connect(self.read_json_file)
+        
+        if self.dict_data is not None:
+            for file_data in self.dict_data:
+                filename = file_data['filename']
+                coor_lat = file_data['latitude']
+                coor_long = file_data['longitude']
+                print(filename)
+        
         # Run the dialog event loop
         result = self.dlg.exec_()
-        # See if OK was pressed
+        
+        # OK has been pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            pass
+            print("start")
+            
+            print("end")
+
+    # Selects the image.json file
+    def select_image_json_file(self):
+        file_dir = QFileDialog.getOpenFileName()
+        file_dir = file_dir[0]
+        
+        self.dlg.lineImageFile.setText(str(file_dir))
+
+    # Reads in from the json file and converts it to a dictionary
+    def read_json_file(self):
+        json_file = self.dlg.lineImageFile.text()
+        
+        f = open(str(json_file))
+        self.dict_data = json.loads(f.read())
+        
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
