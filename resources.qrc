@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/odm_image_extents" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
